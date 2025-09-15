@@ -1,0 +1,80 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="600" fill="white"/>
+  
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#333">System Architecture Overview</text>
+  
+  <!-- User Browser -->
+  <rect x="320" y="60" width="160" height="60" rx="8" fill="#e3f2fd" stroke="#1976d2" stroke-width="2"/>
+  <text x="400" y="80" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#333">User Browser</text>
+  <text x="400" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#666">(React Frontend)</text>
+  
+  <!-- Arrow from User Browser to Frontend -->
+  <path d="M400 120 L400 140" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Frontend (Vercel) -->
+  <rect x="280" y="150" width="240" height="80" rx="8" fill="#e8f5e8" stroke="#4caf50" stroke-width="2"/>
+  <text x="400" y="175" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#333">Frontend (Vercel)</text>
+  <text x="400" y="190" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#666">React + Vite UI</text>
+  <text x="520" y="170" font-family="Arial, sans-serif" font-size="9" fill="#4caf50" font-weight="bold">Deployed on Vercel</text>
+  
+  <!-- Arrow from Frontend to Backend -->
+  <path d="M400 230 L400 250" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Backend API (Render) -->
+  <rect x="280" y="260" width="240" height="100" rx="8" fill="#fff3e0" stroke="#ff9800" stroke-width="2"/>
+  <text x="400" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#333">Backend API</text>
+  <text x="400" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#666">Node.js + Express</text>
+  <text x="400" y="315" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#666">Auth, Campaigns</text>
+  <text x="400" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#666">Logs, Segments</text>
+  <text x="530" y="280" font-family="Arial, sans-serif" font-size="9" fill="#ff9800" font-weight="bold">Deployed on Render</text>
+  
+  <!-- Arrows from Backend to three services -->
+  <!-- To Google OAuth -->
+  <path d="M360 360 L200 400" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- To MongoDB -->
+  <path d="M400 360 L400 380" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- To Vendor Simulation -->
+  <path d="M440 360 L600 400" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Google OAuth 2.0 -->
+  <rect x="80" y="410" width="140" height="60" rx="8" fill="#fce4ec" stroke="#e91e63" stroke-width="2"/>
+  <text x="150" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#333">Google OAuth 2.0</text>
+  
+  <!-- MongoDB Atlas -->
+  <rect x="320" y="390" width="160" height="60" rx="8" fill="#e0f2f1" stroke="#009688" stroke-width="2"/>
+  <text x="400" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#333">MongoDB Atlas</text>
+  <text x="400" y="425" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#666">(Persistent DB)</text>
+  
+  <!-- Vendor Simulation -->
+  <rect x="580" y="410" width="140" height="60" rx="8" fill="#f3e5f5" stroke="#9c27b0" stroke-width="2"/>
+  <text x="650" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#333">Vendor Simulation</text>
+  
+  <!-- Arrow from MongoDB to AI Integration -->
+  <path d="M400 450 L400 470" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- AI Integration -->
+  <rect x="320" y="480" width="160" height="60" rx="8" fill="#fff9c4" stroke="#fbc02d" stroke-width="2"/>
+  <text x="400" y="500" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#333">AI Integration</text>
+  <text x="400" y="515" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#666">(OpenAI APIs)</text>
+  
+  <!-- Arrow marker definition -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+  </defs>
+  
+  <!-- Legend -->
+  <rect x="20" y="520" width="200" height="70" fill="none" stroke="#ddd" stroke-width="1" rx="5"/>
+  <text x="30" y="535" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#333">Legend:</text>
+  <circle cx="35" cy="545" r="3" fill="#1976d2"/>
+  <text x="45" y="549" font-family="Arial, sans-serif" font-size="9" fill="#333">Frontend Services</text>
+  <circle cx="35" cy="558" r="3" fill="#ff9800"/>
+  <text x="45" y="562" font-family="Arial, sans-serif" font-size="9" fill="#333">Backend Services</text>
+  <circle cx="35" cy="571" r="3" fill="#009688"/>
+  <text x="45" y="575" font-family="Arial, sans-serif" font-size="9" fill="#333">External Services</text>
+</svg>
