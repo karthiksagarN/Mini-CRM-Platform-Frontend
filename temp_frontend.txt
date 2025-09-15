@@ -1,0 +1,1746 @@
+Directory structure:
+└── frontend/
+    ├── README.md
+    ├── package.json
+    ├── postcss.config.js
+    ├── tailwind.config.js
+    ├── public/
+    │   ├── auth-success.html
+    │   └── index.html
+    └── src/
+        ├── App.jsx
+        ├── index.css
+        ├── index.jsx
+        ├── api/
+        │   └── apiClient.js
+        ├── components/
+        │   ├── Loading.jsx
+        │   ├── Navbar.jsx
+        │   ├── PrivateRoute.jsx
+        │   ├── RuleRow.jsx
+        │   └── Sidebar.jsx
+        ├── contexts/
+        │   └── AuthContext.jsx
+        ├── pages/
+        │   ├── Analytics.jsx
+        │   ├── CampaignDetail.jsx
+        │   ├── Campaigns.jsx
+        │   ├── CommunicationLogs.jsx
+        │   ├── CreateCampaign.jsx
+        │   ├── CreateCustomer.jsx
+        │   ├── CreateOrder.jsx
+        │   ├── CreateSegment.jsx
+        │   ├── CustomerDetail.jsx
+        │   ├── Customers.jsx
+        │   ├── Dashboard.jsx
+        │   ├── Login.jsx
+        │   ├── OrderDetail.jsx
+        │   ├── Orders.jsx
+        │   ├── SegmentDetail.jsx
+        │   └── Segments.jsx
+        └── utils/
+            └── helpers.js
+
+================================================
+FILE: frontend/README.md
+================================================
+[Empty file]
+
+
+================================================
+FILE: frontend/package.json
+================================================
+{
+  "name": "crm-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "axios": "^1.7.2",
+    "dayjs": "^1.11.9",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.23.1",
+    "react-scripts": "5.0.1",
+    "recharts": "^2.12.7"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
+
+
+
+================================================
+FILE: frontend/postcss.config.js
+================================================
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
+
+
+
+================================================
+FILE: frontend/tailwind.config.js
+================================================
+module.exports = {
+  content: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
+  theme: {
+    extend: {
+      colors: {
+        primary: '#0f172a', // deep navy
+        accent: '#06b6d4'   // teal
+      }
+    },
+  },
+  plugins: [],
+}
+
+
+
+================================================
+FILE: frontend/public/auth-success.html
+================================================
+<!doctype html>
+<html>
+  <body>
+    <script>
+      // If this file is opened by the OAuth flow and query param contains token, forward to opener
+      (function(){
+        const params = new URLSearchParams(location.search);
+        const token = params.get('token');
+        if (token && window.opener) {
+          window.opener.postMessage({ type: 'XENO_AUTH', token }, '*');
+          document.write('Authentication successful. You can close this window.');
+        } else {
+          document.write('No token found. Please copy the token JSON and paste it in the app.');
+        }
+      })();
+    </script>
+  </body>
+</html>
+
+
+
+================================================
+FILE: frontend/public/index.html
+================================================
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mini CRM</title>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+
+
+
+================================================
+FILE: frontend/src/App.jsx
+================================================
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
+import Customers from './pages/Customers';
+import CustomerDetail from './pages/CustomerDetail';
+import Orders from './pages/Orders';
+import OrderDetail from './pages/OrderDetail';
+import Segments from './pages/Segments';
+import CreateSegment from './pages/CreateSegment';
+import SegmentDetail from './pages/SegmentDetail';
+import Campaigns from './pages/Campaigns';
+import CreateCampaign from './pages/CreateCampaign';
+import CampaignDetail from './pages/CampaignDetail';
+import CommunicationLogs from './pages/CommunicationLogs';
+import PrivateRoute from './components/PrivateRoute';
+import Analytics from './pages/Analytics';
+import CreateCustomer from './pages/CreateCustomer';
+import CreateOrder from './pages/CreateOrder';
+
+export default function App(){
+  return (
+    <div>
+      <Navbar />
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <Routes>
+          <Route path="/" element={<Dashboard/>} />
+          <Route path="/login" element={<Login/>} />
+          <Route path="/customers" element={<PrivateRoute><Customers/></PrivateRoute>} />
+          <Route path="/customers/:id" element={<PrivateRoute><CustomerDetail/></PrivateRoute>} />
+          <Route path="/customers/new" element={<PrivateRoute><CreateCustomer/></PrivateRoute>} />
+          <Route path="/orders" element={<PrivateRoute><Orders/></PrivateRoute>} />
+          <Route path="/orders/:id" element={<PrivateRoute><OrderDetail/></PrivateRoute>} />
+          <Route path="/orders/new" element={<PrivateRoute><CreateOrder/></PrivateRoute>} />
+          <Route path="/segments" element={<PrivateRoute><Segments/></PrivateRoute>} />
+          <Route path="/segments/new" element={<PrivateRoute><CreateSegment/></PrivateRoute>} />
+          <Route path="/segments/:id" element={<PrivateRoute><SegmentDetail/></PrivateRoute>} />
+          <Route path="/campaigns" element={<PrivateRoute><Campaigns/></PrivateRoute>} />
+          <Route path="/campaigns/new" element={<PrivateRoute><CreateCampaign/></PrivateRoute>} />
+          <Route path="/campaigns/:id" element={<PrivateRoute><CampaignDetail/></PrivateRoute>} />
+          <Route path="/logs" element={<PrivateRoute><CommunicationLogs/></PrivateRoute>} />
+          <Route path="/analytics" element={<PrivateRoute><Analytics/></PrivateRoute>} />
+        </Routes>
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/index.css
+================================================
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* small UI tweaks */
+body { @apply bg-gray-50 text-gray-800; }
+
+
+
+================================================
+FILE: frontend/src/index.jsx
+================================================
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+import './index.css';
+import { AuthProvider } from './contexts/AuthContext';
+
+createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </BrowserRouter>
+  </React.StrictMode>
+);
+
+
+
+================================================
+FILE: frontend/src/api/apiClient.js
+================================================
+import axios from 'axios';
+
+const BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000';
+
+const api = axios.create({
+  baseURL: BASE + '/api',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  timeout: 15000
+});
+
+export const setAuthToken = (token) => {
+  if (token) api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  else delete api.defaults.headers.common['Authorization'];
+};
+
+export default api;
+
+
+
+================================================
+FILE: frontend/src/components/Loading.jsx
+================================================
+export default function Loading(){ 
+  return <div className="w-full flex justify-center items-center p-6">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+  </div>;
+}
+
+
+
+================================================
+FILE: frontend/src/components/Navbar.jsx
+================================================
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+
+export default function Navbar(){
+  const { user, logout } = useAuth();
+  return (
+    <div className="bg-white shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link to="/" className="text-xl font-semibold text-primary">Mini CRM</Link>
+          <nav className="hidden md:flex gap-2 text-sm">
+            <Link to="/customers" className="px-3 py-2 rounded hover:bg-gray-100">Customers</Link>
+            <Link to="/orders" className="px-3 py-2 rounded hover:bg-gray-100">Orders</Link>
+            <Link to="/segments" className="px-3 py-2 rounded hover:bg-gray-100">Segments</Link>
+            <Link to="/campaigns" className="px-3 py-2 rounded hover:bg-gray-100">Campaigns</Link>
+            <Link to="/logs" className="px-3 py-2 rounded hover:bg-gray-100">Logs</Link>
+            <Link to="/analytics" className="px-3 py-2 rounded hover:bg-gray-100">Analytics</Link>
+          </nav>
+        </div>
+
+        <div>
+          {user ? (
+            <div className="flex items-center gap-3">
+              <div className="text-sm text-gray-700">{user.name || user.email}</div>
+              <button onClick={logout} className="text-sm px-3 py-1 rounded border">Logout</button>
+            </div>
+          ) : (
+            <Link to="/login" className="text-sm px-3 py-1 rounded border">Login</Link>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/components/PrivateRoute.jsx
+================================================
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+
+export default function PrivateRoute({ children }){
+  const { token } = useAuth();
+  if (!token) return <Navigate to="/login" replace />;
+  return children;
+}
+
+
+
+================================================
+FILE: frontend/src/components/RuleRow.jsx
+================================================
+import React from 'react';
+
+const operators = [
+  { value: 'equals', label: 'equals' },
+  { value: 'contains', label: 'contains' },
+  { value: 'greaterThan', label: '>' },
+  { value: 'lessThan', label: '<' },
+];
+
+export default function RuleRow({ rule, onChange, onRemove }) {
+  return (
+    <div className="flex gap-2 items-center">
+      <input className="border rounded p-2 flex-1" placeholder="field (eg attributes.spend)"
+        value={rule.field} onChange={e => onChange({...rule, field: e.target.value})} />
+      <select className="border rounded p-2" value={rule.operator} onChange={e => onChange({...rule, operator: e.target.value})}>
+        {operators.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+      </select>
+      <input className="border rounded p-2 w-36" value={rule.value} onChange={e => onChange({...rule, value: e.target.value})} />
+      <button className="px-2 py-1 text-sm bg-red-50 text-red-600 rounded" onClick={onRemove}>Remove</button>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/components/Sidebar.jsx
+================================================
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+export default function Sidebar(){
+  return (
+    <aside className="w-56 p-4 bg-white rounded shadow">
+      <nav className="flex flex-col gap-2 text-sm">
+        <Link to="/" className="px-3 py-2 rounded hover:bg-gray-50">Dashboard</Link>
+        <Link to="/customers" className="px-3 py-2 rounded hover:bg-gray-50">Customers</Link>
+        <Link to="/orders" className="px-3 py-2 rounded hover:bg-gray-50">Orders</Link>
+        <Link to="/segments" className="px-3 py-2 rounded hover:bg-gray-50">Segments</Link>
+        <Link to="/campaigns" className="px-3 py-2 rounded hover:bg-gray-50">Campaigns</Link>
+        <Link to="/logs" className="px-3 py-2 rounded hover:bg-gray-50">Communication Logs</Link>
+      </nav>
+    </aside>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/contexts/AuthContext.jsx
+================================================
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { setAuthToken } from '../api/apiClient';
+
+const AuthContext = createContext();
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('xeno_user')) || null;
+    } catch { return null; }
+  });
+  const [token, setToken] = useState(() => localStorage.getItem('xeno_token') || null);
+
+  useEffect(() => {
+    if (token) {
+      setAuthToken(token);
+    } else {
+      setAuthToken(null);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    // Listen for auth popup postMessage
+    function onMessage(e) {
+      if (e.data && e.data.type === 'XENO_AUTH' && e.data.token) {
+        const t = e.data.token;
+        localStorage.setItem('xeno_token', t);
+        setToken(t);
+        // Optionally decode token for user info (we'll keep it simple)
+        try {
+          const payloadBase = t.split('.')[1];
+          const json = JSON.parse(atob(payloadBase));
+          const u = { name: json.name, email: json.email, id: json.sub };
+          localStorage.setItem('xeno_user', JSON.stringify(u));
+          setUser(u);
+        } catch (err) {
+          // ignore
+        }
+      }
+    }
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, []);
+
+  const loginWithToken = (t) => {
+    localStorage.setItem('xeno_token', t);
+    setToken(t);
+    try {
+      const payloadBase = t.split('.')[1];
+      const json = JSON.parse(atob(payloadBase));
+      const u = { name: json.name, email: json.email, id: json.sub };
+      localStorage.setItem('xeno_user', JSON.stringify(u));
+      setUser(u);
+    } catch (err) {}
+  };
+
+  const logout = () => {
+    localStorage.removeItem('xeno_token');
+    localStorage.removeItem('xeno_user');
+    setToken(null);
+    setUser(null);
+    setAuthToken(null);
+    window.location.href = '/';
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, token, loginWithToken, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export const useAuth = () => useContext(AuthContext);
+
+
+
+================================================
+FILE: frontend/src/pages/Analytics.jsx
+================================================
+import React, { useEffect, useState } from 'react';
+import api from '../api/apiClient';
+import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import Loading from '../components/Loading';
+
+export default function Analytics() {
+  const [customers, setCustomers] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [campaigns, setCampaigns] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [aiInsights, setAiInsights] = useState('');
+  const [aiRecommendations, setAiRecommendations] = useState('');
+
+  useEffect(()=>{
+    async function load() {
+      try {
+        const [cRes, oRes, campRes] = await Promise.all([
+          api.get('/customers'),
+          api.get('/orders'),
+          api.get('/campaigns')
+        ]);
+        setCustomers(cRes.data || []);
+        setOrders(oRes.data || []);
+        setCampaigns(campRes.data || []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  },[]);
+
+  if (loading) return <Loading />;
+
+  // --- Analysis data ---
+  const spendingDist = customers.map(c => ({ name: c.name || c.email, spending: c.attributes?.totalSpending || 0 }));
+  const orderCounts = customers.map(c => {
+    const count = orders.filter(o => o.customerId?._id === c._id).length;
+    return { name: c.name || c.email, orders: count };
+  });
+  const monthlySales = {};
+  orders.forEach(o => {
+    const month = new Date(o.orderDate).toLocaleString('default',{ month:'short', year:'numeric' });
+    monthlySales[month] = (monthlySales[month] || 0) + o.totalAmount;
+  });
+  const monthlyData = Object.keys(monthlySales).map(m => ({ month: m, sales: monthlySales[m] }));
+
+  const campaignStatus = campaigns.reduce((acc,c) => {
+    acc[c.status] = (acc[c.status] || 0) + 1;
+    return acc;
+  },{});
+  const campaignData = Object.keys(campaignStatus).map(k => ({ name: k, value: campaignStatus[k] }));
+  const COLORS = ['#06b6d4','#0f172a','#f59e0b','#ef4444'];
+
+  const runAIAnalytics = async () => {
+    try {
+      const res = await api.post('/ai/analytics', { customers, orders });
+      setAiInsights(res.data.insights);
+      setAiRecommendations(res.data.recommendations);
+    } catch (err) {
+      alert('AI analytics failed');
+    }
+  };
+
+  return (
+    <div className="space-y-8">
+      <h2 className="text-2xl font-semibold">Analytics</h2>
+
+      <div className="bg-white p-4 rounded shadow h-80">
+        <h3 className="font-medium mb-2">Customer Spending</h3>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={spendingDist}>
+            <XAxis dataKey="name" hide />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="spending" fill="#06b6d4" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="bg-white p-4 rounded shadow h-80">
+        <h3 className="font-medium mb-2">Orders per Customer</h3>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={orderCounts}>
+            <XAxis dataKey="name" hide />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="orders" fill="#0f172a" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="bg-white p-4 rounded shadow h-80">
+        <h3 className="font-medium mb-2">Monthly Sales</h3>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={monthlyData}>
+            <XAxis dataKey="month" />
+            <YAxis />
+            <Tooltip />
+            <Line type="monotone" dataKey="sales" stroke="#06b6d4" strokeWidth={2}/>
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="bg-white p-4 rounded shadow h-80">
+        <h3 className="font-medium mb-2">Campaign Status</h3>
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie data={campaignData} dataKey="value" outerRadius={120} label>
+              {campaignData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="bg-white shadow rounded p-4">
+        <h3 className="font-medium mb-2">AI Insights & Recommendations</h3>
+        <button
+          onClick={runAIAnalytics}
+          className="bg-accent text-white px-4 py-2 rounded"
+        >
+          ✨ Generate AI Insights
+        </button>
+
+        {aiInsights && (
+          <div className="mt-4">
+            <h4 className="font-semibold">Insights</h4>
+            <p className="text-gray-700">{aiInsights}</p>
+          </div>
+        )}
+
+        {aiRecommendations && (
+          <div className="mt-4">
+            <h4 className="font-semibold">Recommendations</h4>
+            <p className="text-gray-700 whitespace-pre-line">{aiRecommendations}</p>
+          </div>
+        )}
+      </div>
+
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/pages/CampaignDetail.jsx
+================================================
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import api from '../api/apiClient';
+import Loading from '../components/Loading';
+
+export default function CampaignDetail() {
+  const { id } = useParams();
+  const [camp, setCamp] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [summary, setSummary] = useState(null);     // raw stats from backend
+  const [aiSummary, setAiSummary] = useState('');   // AI-generated summary
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await api.get(`/campaigns/${id}`);
+        setCamp(res.data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [id]);
+
+  const sendNow = async () => {
+    if (!window.confirm('Send campaign now?')) return;
+    setSending(true);
+    try {
+      const res = await api.post(`/campaigns/${id}/send`);
+      setSummary(res.data);
+      alert('Send initiated. Stats received.');
+    } catch (err) {
+      console.error(err);
+      alert('Send failed');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const summarizeWithAI = async () => {
+    if (!summary) return alert('No stats available yet.');
+    try {
+      const res = await api.post('/ai/summary', { stats: summary });
+      setAiSummary(res.data.summary);
+    } catch (err) {
+      console.error(err);
+      alert('AI failed to summarize stats');
+    }
+  };
+
+  if (loading) return <Loading />;
+  if (!camp) return <div>Campaign not found</div>;
+
+  return (
+    <div className="bg-white p-6 rounded shadow space-y-4">
+      <h2 className="text-xl font-semibold">{camp.name}</h2>
+      <div>
+        Message:{' '}
+        <pre className="bg-gray-50 p-2 rounded">{camp.message}</pre>
+      </div>
+      <div>Segment: {camp.segmentId}</div>
+      <div>Status: {camp.status}</div>
+
+      <div className="flex gap-2">
+        <button
+          onClick={sendNow}
+          className="px-3 py-2 bg-accent text-white rounded"
+          disabled={sending}
+        >
+          {sending ? 'Sending...' : 'Send now'}
+        </button>
+      </div>
+
+      {summary && (
+        <div className="border p-3 rounded bg-gray-50 space-y-2">
+          <div><strong>Total:</strong> {summary.total}</div>
+          <div><strong>Sent:</strong> {summary.sent}</div>
+          <div><strong>Failed:</strong> {summary.failed}</div>
+
+          <button
+            onClick={summarizeWithAI}
+            className="mt-2 px-3 py-1 bg-blue-600 text-white rounded"
+          >
+            ✨ Summarize with AI
+          </button>
+
+          {aiSummary && (
+            <p className="mt-2 text-gray-700">{aiSummary}</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/pages/Campaigns.jsx
+================================================
+import React, { useEffect, useState } from 'react';
+import api from '../api/apiClient';
+import { Link } from 'react-router-dom';
+import Loading from '../components/Loading';
+
+export default function Campaigns(){
+  const [campaigns, setCampaigns] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(()=>{
+    async function load(){
+      try {
+        const res = await api.get('/campaigns');
+        setCampaigns(res.data || []);
+      } catch (err) { console.error(err); }
+      finally { setLoading(false); }
+    }
+    load();
+  },[]);
+
+  if (loading) return <Loading />;
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Campaigns</h2>
+        <Link to="/campaigns/new" className="px-3 py-2 bg-accent text-white rounded">Create campaign</Link>
+      </div>
+
+      <div className="bg-white rounded shadow">
+        <table className="w-full">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="p-3 text-left">Name</th>
+              <th className="p-3 text-left">Segment</th>
+              <th className="p-3 text-left">Status</th>
+              <th className="p-3 text-left">CreatedAt</th>
+              <th className="p-3 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {campaigns.map(c => (
+              <tr key={c._id} className="border-t">
+                <td className="p-3"><Link to={`/campaigns/${c._id}`} className="text-accent">{c.name}</Link></td>
+                <td className="p-3">{c.segmentId || '-'}</td>
+                <td className="p-3">{c.status}</td>
+                <td className="p-3">{new Date(c.createdAt).toLocaleString()}</td>
+                <td className="p-3">
+                  <Link to={`/campaigns/${c._id}`} className="text-blue-600">View</Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/pages/CommunicationLogs.jsx
+================================================
+import React, { useEffect, useState } from 'react';
+import api from '../api/apiClient';
+import Loading from '../components/Loading';
+
+export default function CommunicationLogs(){
+  const [logs, setLogs] = useState([]);
+  const [loading,setLoading] = useState(true);
+
+  useEffect(()=>{
+    async function load(){
+      try {
+        const res = await api.get('/communication-logs');
+        setLogs(res.data || []);
+      } catch (err) { console.error(err); }
+      finally { setLoading(false); }
+    }
+    load();
+  },[]);
+
+  if (loading) return <Loading />;
+
+  return (
+    <div>
+      <h2 className="text-xl font-semibold mb-3">Communication Logs</h2>
+      <div className="bg-white rounded shadow overflow-auto">
+        <table className="w-full">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="p-3 text-left">Customer</th>
+              <th className="p-3 text-left">Campaign</th>
+              <th className="p-3 text-left">Status</th>
+              <th className="p-3 text-left">SentAt</th>
+              <th className="p-3 text-left">Response</th>
+            </tr>
+          </thead>
+          <tbody>
+            {logs.map(l => (
+              <tr key={l._id} className="border-t">
+                <td className="p-3">{l.customerId || l.customerId?.email || '-'}</td>
+                <td className="p-3">{l.campaignId || '-'}</td>
+                <td className="p-3">{l.status}</td>
+                <td className="p-3">{new Date(l.sentAt).toLocaleString()}</td>
+                <td className="p-3">{l.response}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/pages/CreateCampaign.jsx
+================================================
+import React, { useEffect, useState } from 'react';
+import api from '../api/apiClient';
+import { useNavigate } from 'react-router-dom';
+// import Loading from '../components/Loading';
+
+export default function CreateCampaign() {
+  const [segments, setSegments] = useState([]);
+  const [name, setName] = useState('');
+  const [segmentId, setSegmentId] = useState('');
+  const [message, setMessage] = useState('Hi {{name}}, here\'s 10% off on your next order!');
+  const [scheduledAt, setScheduledAt] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [objective, setObjective] = useState('');   // 👈 New state for AI
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await api.get('/segments');
+        setSegments(res.data || []);
+      } catch (err) {
+        console.warn('GET /api/segments not available; please add list route on backend.');
+        setSegments([]);
+      }
+    }
+    load();
+  }, []);
+
+  const create = async () => {
+    if (!name || !segmentId) return alert('Please name campaign and choose segment');
+    setLoading(true);
+    try {
+      const res = await api.post('/campaigns', {
+        name,
+        segmentId,
+        message,
+        scheduledAt: scheduledAt || undefined,
+      });
+      alert('Campaign created');
+      navigate(`/campaigns/${res.data._id}`);
+    } catch (err) {
+      console.error(err);
+      alert('Create failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const suggestMessages = async () => {
+    if (!objective.trim()) return alert('Please enter a campaign objective for AI');
+    setLoading(true);
+    try {
+      const res = await api.post('/ai/suggest-messages', { objective });
+      if (res.data.messages && res.data.messages.length > 0) {
+        setMessage(res.data.messages[0]); // Auto-fill first suggestion
+        alert('AI suggested messages:\n' + res.data.messages.join('\n'));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('AI failed to suggest messages');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="bg-white p-6 rounded shadow">
+      <h2 className="text-xl font-semibold mb-4">Create Campaign</h2>
+
+      <div className="space-y-3 mb-4">
+        <input
+          placeholder="Campaign name"
+          className="w-full border rounded p-2"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+
+        <select
+          value={segmentId}
+          onChange={(e) => setSegmentId(e.target.value)}
+          className="w-full border rounded p-2"
+        >
+          <option value="">Select segment</option>
+          {segments.map((s) => (
+            <option key={s._id} value={s._id}>
+              {s.name}
+            </option>
+          ))}
+        </select>
+
+        {/* 👇 New AI objective input + button */}
+        <input
+          className="w-full border rounded p-2 mb-2"
+          placeholder="Campaign Objective (e.g., win back inactive users)"
+          value={objective}
+          onChange={(e) => setObjective(e.target.value)}
+        />
+        <button
+          onClick={suggestMessages}
+          className="bg-accent text-white px-3 py-1 rounded"
+        >
+          ✨ Suggest Messages with AI
+        </button>
+
+        <textarea
+          className="w-full border rounded p-2"
+          rows={4}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        />
+
+        <input
+          type="datetime-local"
+          className="border rounded p-2"
+          value={scheduledAt}
+          onChange={(e) => setScheduledAt(e.target.value)}
+        />
+      </div>
+
+      <div className="flex gap-2">
+        <button
+          onClick={create}
+          className="px-4 py-2 bg-accent text-white rounded"
+          disabled={loading}
+        >
+          {loading ? 'Saving...' : 'Save campaign'}
+        </button>
+      </div>
+
+      <div className="mt-4 text-xs text-gray-500">
+        Tip: You can include{' '}
+        <code className="bg-gray-100 p-1 rounded">{'{{name}}'}</code> in message
+        for personalization.
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/pages/CreateCustomer.jsx
+================================================
+import React, { useState } from 'react';
+import api from '../api/apiClient';
+import { useNavigate } from 'react-router-dom';
+
+export default function CreateCustomer() {
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [totalSpending, setTotalSpending] = useState('');
+  const [visits, setVisits] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const submit = async () => {
+    if (!email || !name) return alert('Email and Name required');
+    setLoading(true);
+    try {
+      const body = {
+        email,
+        name,
+        attributes: {
+          totalSpending: Number(totalSpending) || 0,
+          visits: Number(visits) || 0
+        }
+      };
+      await api.post('/customers', body);
+      alert('Customer created successfully');
+      navigate('/customers');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to create customer');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="bg-white p-6 rounded shadow max-w-lg mx-auto">
+      <h2 className="text-xl font-semibold mb-4">Create Customer</h2>
+      <div className="space-y-3">
+        <input className="w-full border rounded p-2" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} />
+        <input className="w-full border rounded p-2" placeholder="Name" value={name} onChange={e=>setName(e.target.value)} />
+        <input className="w-full border rounded p-2" placeholder="Total Spending" type="number" value={totalSpending} onChange={e=>setTotalSpending(e.target.value)} />
+        <input className="w-full border rounded p-2" placeholder="Visits" type="number" value={visits} onChange={e=>setVisits(e.target.value)} />
+        <button onClick={submit} disabled={loading} className="px-4 py-2 bg-accent text-white rounded">
+          {loading ? 'Saving...' : 'Create'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/pages/CreateOrder.jsx
+================================================
+import React, { useEffect, useState } from 'react';
+import api from '../api/apiClient';
+import { useNavigate } from 'react-router-dom';
+
+export default function CreateOrder() {
+  const [customers, setCustomers] = useState([]);
+  const [customerId, setCustomerId] = useState('');
+  const [items, setItems] = useState([{ productId: '', quantity: 1, price: 0 }]);
+  const [orderDate, setOrderDate] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    async function loadCustomers() {
+      try {
+        const res = await api.get('/customers');
+        setCustomers(res.data || []);
+      } catch (err) {
+        console.error(err);
+        alert('Failed to load customers');
+      }
+    }
+    loadCustomers();
+  }, []);
+
+  const handleItemChange = (index, field, value) => {
+    setItems(items.map((item, i) => 
+      i === index ? { ...item, [field]: value } : item
+    ));
+  };
+
+  const addItem = () => setItems([...items, { productId: '', quantity: 1, price: 0 }]);
+  const removeItem = (index) => setItems(items.filter((_, i) => i !== index));
+
+  const createOrder = async () => {
+    if (!customerId) return alert('Please select a customer');
+    try {
+      const res = await api.post('/orders', {
+        customerId,
+        items,
+        orderDate: orderDate || new Date().toISOString(),
+      });
+      alert('Order created successfully!');
+      navigate(`/orders/${res.data._id}`);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to create order');
+    }
+  };
+
+  return (
+    <div className="bg-white p-6 rounded shadow">
+      <h2 className="text-xl font-semibold mb-4">Create Order</h2>
+
+      {/* Customer selection */}
+      <label className="block text-sm mb-1">Customer</label>
+      <select
+        className="w-full border rounded p-2 mb-4"
+        value={customerId}
+        onChange={(e) => setCustomerId(e.target.value)}
+      >
+        <option value="">Select customer</option>
+        {customers.map((c) => (
+          <option key={c._id} value={c._id}>
+            {c.name} ({c.email})
+          </option>
+        ))}
+      </select>
+
+      {/* Items */}
+      <h3 className="text-lg font-medium mb-2">Items</h3>
+      {items.map((item, i) => (
+        <div key={i} className="flex gap-2 mb-2">
+          <input
+            placeholder="Product Name / ID"
+            className="border rounded p-2 flex-1"
+            value={item.productId}
+            onChange={(e) => handleItemChange(i, 'productId', e.target.value)}
+          />
+          <input
+            type="number"
+            placeholder="Quantity"
+            className="border rounded p-2 w-24"
+            value={item.quantity}
+            onChange={(e) => handleItemChange(i, 'quantity', parseInt(e.target.value))}
+          />
+          <input
+            type="number"
+            placeholder="Price"
+            className="border rounded p-2 w-24"
+            value={item.price}
+            onChange={(e) => handleItemChange(i, 'price', parseFloat(e.target.value))}
+          />
+          <button
+            className="px-2 bg-red-500 text-white rounded"
+            onClick={() => removeItem(i)}
+          >
+            ✕
+          </button>
+        </div>
+      ))}
+      <button onClick={addItem} className="px-3 py-1 border rounded mb-4">+ Add Item</button>
+
+      {/* Order Date */}
+      <label className="block text-sm mb-1">Order Date</label>
+      <input
+        type="datetime-local"
+        className="border rounded p-2 mb-4"
+        value={orderDate}
+        onChange={(e) => setOrderDate(e.target.value)}
+      />
+
+      {/* Save */}
+      <button onClick={createOrder} className="px-4 py-2 bg-accent text-white rounded">
+        Save Order
+      </button>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/pages/CreateSegment.jsx
+================================================
+import React, { useState } from 'react';
+import api from '../api/apiClient';
+import RuleRow from '../components/RuleRow';
+import { useNavigate } from 'react-router-dom';
+import Loading from '../components/Loading';
+
+export default function CreateSegment() {
+  const [name, setName] = useState('');
+  const [rules, setRules] = useState([{ field: 'attributes.spend', operator: 'greaterThan', value: 1000 }]);
+  const [nlInput, setNlInput] = useState('');
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const updateRule = (idx, r) => setRules(rs => rs.map((x, i) => i === idx ? r : x));
+  const removeRule = (idx) => setRules(rs => rs.filter((_, i) => i !== idx));
+  const addRule = () => setRules(rs => [...rs, { field: '', operator: 'equals', value: '' }]);
+
+  const doAIParse = async () => {
+    if (!nlInput.trim()) return alert('Please describe your audience in natural language');
+    setLoading(true);
+    try {
+      const res = await api.post('/ai/parse-segment', { text: nlInput });
+      const parsed = res.data.rules || [];
+      setRules(parsed);
+      alert('AI parsed rules and inserted into builder.');
+    } catch (err) {
+      console.error(err);
+      alert('AI parse failed. See console.');
+    } finally { setLoading(false); }
+  };
+
+  const previewSegment = async () => {
+    setLoading(true);
+    try {
+      const res = await api.post('/segments/evaluate', { rules });
+      setPreview(res.data);
+    } catch (err) {
+      console.error(err);
+      alert('Preview failed');
+    } finally { setLoading(false); }
+  };
+
+  const saveSegment = async () => {
+    if (!name) return alert('Please give a segment name');
+    setLoading(true);
+    try {
+      const res = await api.post('/segments', { name, rules });
+      alert('Segment created');
+      navigate(`/segments/${res.data._id}`);
+    } catch (err) {
+      console.error(err);
+      alert('Save failed');
+    } finally { setLoading(false); }
+  };
+
+  return (
+    <div className="bg-white p-6 rounded shadow">
+      <h2 className="text-xl font-semibold mb-4">Create Segment</h2>
+
+      {/* Segment name */}
+      <div className="mb-3">
+        <label className="block text-sm mb-1">Name</label>
+        <input
+          className="w-full border rounded p-2"
+          value={name}
+          onChange={e => setName(e.target.value)}
+        />
+      </div>
+
+      {/* Natural language input for AI parsing */}
+      <div className="mb-3">
+        <label className="block text-sm mb-1">Describe audience (AI will parse)</label>
+        <textarea
+          className="w-full border rounded p-2"
+          rows={3}
+          placeholder='e.g., "Customers who spent more than 5000 and visited less than 3 times"'
+          value={nlInput}
+          onChange={e => setNlInput(e.target.value)}
+        />
+        <button
+          onClick={doAIParse}
+          className="mt-2 px-3 py-2 bg-blue-50 text-blue-700 rounded"
+        >
+          ✨ AI → rules
+        </button>
+      </div>
+
+      {/* Rule builder */}
+      <div className="space-y-2 mb-4">
+        {rules.map((r, i) => (
+          <RuleRow
+            key={i}
+            rule={r}
+            onChange={(newR) => updateRule(i, newR)}
+            onRemove={() => removeRule(i)}
+          />
+        ))}
+      </div>
+
+      {/* Actions */}
+      <div className="flex gap-2">
+        <button onClick={addRule} className="px-3 py-2 border rounded">Add rule</button>
+        <button onClick={previewSegment} className="px-3 py-2 bg-accent text-white rounded">Preview audience</button>
+        <button onClick={saveSegment} className="px-3 py-2 bg-primary text-white rounded">Save segment</button>
+      </div>
+
+      {/* Preview output */}
+      <div className="mt-4">
+        {loading && <Loading />}
+        {preview && (
+          <div className="mt-4 border p-3 rounded bg-gray-50">
+            <div>Matched count: <strong>{preview.count}</strong></div>
+            <div className="mt-2 text-sm text-gray-600">First 10 matched customers:</div>
+            <ul className="mt-2">
+              {(preview.customers || []).slice(0, 10).map(c => (
+                <li key={c._id} className="py-1">
+                  {c.name || c.email} — {c.email}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/pages/CustomerDetail.jsx
+================================================
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import api from '../api/apiClient';
+import Loading from '../components/Loading';
+
+export default function CustomerDetail(){
+  const { id } = useParams();
+  const [cust, setCust] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(()=>{
+    async function load() {
+      try {
+        const res = await api.get(`/customers/${id}`);
+        setCust(res.data);
+      } catch (err) {
+        console.error(err);
+      } finally { setLoading(false); }
+    }
+    load();
+  }, [id]);
+
+  if (loading) return <Loading/>;
+
+  if (!cust) return <div>Customer not found</div>;
+
+  return (
+    <div className="bg-white p-6 rounded shadow">
+      <h2 className="text-xl font-semibold mb-2">{cust.name || cust.email}</h2>
+      <div className="text-sm text-gray-600">Email: {cust.email}</div>
+      <div className="mt-4">
+        <h3 className="font-medium">Attributes</h3>
+        <pre className="bg-gray-50 p-3 rounded mt-2 text-sm">{JSON.stringify(cust.attributes || {}, null, 2)}</pre>
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/pages/Customers.jsx
+================================================
+import React, { useEffect, useState } from 'react';
+import api from '../api/apiClient';
+import { Link } from 'react-router-dom';
+import Loading from '../components/Loading';
+
+export default function Customers(){
+  const [customers, setCustomers] = useState([]);
+  const [loading,setLoading] = useState(true);
+
+  useEffect(()=>{
+    async function fetch() {
+      try {
+        const res = await api.get('/customers');
+        setCustomers(res.data || []);
+      } catch (err) {
+        console.error(err);
+      } finally { setLoading(false); }
+    }
+    fetch();
+  },[]);
+
+  if (loading) return <Loading/>;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Customers</h2>
+        <Link to="/customers/new" className="px-3 py-2 bg-accent text-white rounded">Add Customer</Link>
+      </div>
+
+      <div className="bg-white rounded shadow overflow-auto">
+        <table className="w-full table-auto">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="p-3 text-left">Name</th>
+              <th className="p-3 text-left">Email</th>
+              <th className="p-3 text-left">Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {customers.map(c => (
+              <tr key={c._id} className="border-t">
+                <td className="p-3"><Link to={`/customers/${c._id}`} className="text-accent">{c.name || '-'}</Link></td>
+                <td className="p-3">{c.email}</td>
+                <td className="p-3">{new Date(c.createdAt).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/pages/Dashboard.jsx
+================================================
+import React, { useEffect, useState } from 'react';
+import api from '../api/apiClient';
+import Loading from '../components/Loading';
+
+export default function Dashboard(){
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(()=>{
+    async function load() {
+      try {
+        const resCust = await api.get('/customers'); // fetch customers
+        const resCamp = await api.get('/campaigns'); // campaigns
+        const resOrders = await api.get('/orders');
+        setStats({
+          customers: (resCust.data || []).length,
+          campaigns: (resCamp.data || []).length,
+          orders: (resOrders.data || []).length
+        });
+      } catch (err) {
+        setStats({ customers: 0, campaigns: 0, orders: 0 });
+      } finally { setLoading(false); }
+    }
+    load();
+  }, []);
+
+  if (loading) return <Loading />;
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="bg-white rounded shadow p-4">
+        <div className="text-sm text-gray-500">Customers</div>
+        <div className="text-3xl font-bold">{stats.customers}</div>
+      </div>
+      <div className="bg-white rounded shadow p-4">
+        <div className="text-sm text-gray-500">Campaigns</div>
+        <div className="text-3xl font-bold">{stats.campaigns}</div>
+      </div>
+      <div className="bg-white rounded shadow p-4">
+        <div className="text-sm text-gray-500">Orders</div>
+        <div className="text-3xl font-bold">{stats.orders}</div>
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/pages/Login.jsx
+================================================
+import React from 'react';
+import { useAuth } from '../contexts/AuthContext';
+
+export default function Login(){
+  const { user, logout } = useAuth();
+
+  const openOAuth = () => {
+    // Open popup to backend google auth start
+    // const popup = window.open(
+    //   `${process.env.REACT_APP_API_BASE || 'http://localhost:4000'}/api/auth/google`,
+    //   'oauth',
+    //   'width=600,height=700'
+    // );
+    window.open(
+      `${process.env.REACT_APP_API_BASE || 'http://localhost:4000'}/api/auth/google`,
+      'oauth',
+      'width=600,height=700'
+    );
+    // popup will postMessage token via backend helper page (see recommended backend change)
+  };
+
+  const manualPaste = () => {
+    const token = prompt('Paste the JWT token JSON value (or token string) here:');
+    if (token) {
+      // If they pasted full JSON like {"token":"..."} try parse
+      try {
+        const parsed = JSON.parse(token);
+        if (parsed.token) {
+          window.postMessage({ type: 'XENO_AUTH', token: parsed.token }, window.location.origin);
+        } else {
+          window.postMessage({ type: 'XENO_AUTH', token: token }, window.location.origin);
+        }
+      } catch {
+        window.postMessage({ type: 'XENO_AUTH', token }, window.location.origin);
+      }
+    }
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto mt-8">
+      <div className="bg-white p-6 rounded shadow">
+        <h2 className="text-2xl mb-4">Login with Google</h2>
+        <p className="text-sm text-gray-600 mb-4">Click the button to authenticate via Google.</p>
+        <div className="flex gap-3">
+          <button onClick={openOAuth} className="px-4 py-2 bg-accent text-white rounded">Sign in with Google</button>
+          <button onClick={manualPaste} className="px-4 py-2 border rounded">Paste token</button>
+          {user && <button onClick={logout} className="px-4 py-2 border rounded">Logout</button>}
+        </div>
+
+        <div className="mt-4 text-xs text-gray-500">
+          <p>If authentication popup doesn’t auto-close, copy the token JSON shown by the backend and use "Paste token".</p>
+          <p className="mt-2">For a smoother popup experience, please apply the small backend tweak I recommended (have the callback postMessage token to opener).</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/pages/OrderDetail.jsx
+================================================
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import api from '../api/apiClient';
+import Loading from '../components/Loading';
+
+export default function OrderDetail(){
+  const { id } = useParams();
+  const [order, setOrder] = useState(null);
+  const [loading,setLoading] = useState(true);
+
+  useEffect(()=>{
+    async function load(){
+      try {
+        const res = await api.get(`/orders/${id}`);
+        setOrder(res.data);
+      } catch (err) { console.error(err); }
+      finally { setLoading(false); }
+    }
+    load();
+  }, [id]);
+
+  if (loading) return <Loading />;
+  if (!order) return <div>Order not found</div>;
+
+  return (
+    <div className="bg-white p-6 rounded shadow">
+      <h2 className="text-xl font-semibold mb-2">Order {order.orderId}</h2>
+      <div>Customer: {order.customerId?.email || '-'}</div>
+      <div className="mt-4">
+        <h3 className="font-medium">Items</h3>
+        <ul className="mt-2">
+          {order.items.map((it, idx) => (
+            <li key={idx} className="py-1">
+              {it.productId} — {it.quantity} × {it.price}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="mt-4">Total: <strong>{order.totalAmount}</strong></div>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/pages/Orders.jsx
+================================================
+import React, { useEffect, useState } from 'react';
+import api from '../api/apiClient';
+import { Link } from 'react-router-dom';
+import Loading from '../components/Loading';
+
+export default function Orders(){
+  const [orders, setOrders] = useState([]);
+  const [loading,setLoading] = useState(true);
+
+  useEffect(()=>{
+    async function fetch() {
+      try {
+        const res = await api.get('/orders');
+        setOrders(res.data || []);
+      } catch (err) {
+        console.error(err);
+      } finally { setLoading(false); }
+    }
+    fetch();
+  },[]);
+
+  if (loading) return <Loading/>;
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold">Orders</h2>
+        <Link to="/orders/new" className="px-3 py-2 bg-accent text-white rounded">Add Order</Link>
+      </div>
+      <div className="bg-white rounded shadow overflow-auto">
+        <table className="w-full">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="p-3 text-left">Order ID</th>
+              <th className="p-3 text-left">Customer</th>
+              <th className="p-3 text-left">Total</th>
+              <th className="p-3 text-left">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders.map(o => (
+              <tr key={o._id} className="border-t">
+                <td className="p-3"><Link to={`/orders/${o._id}`} className="text-accent">{o.orderId || o._id}</Link></td>
+                <td className="p-3">{(o.customerId && o.customerId.email) || '-'}</td>
+                <td className="p-3">{o.totalAmount}</td>
+                <td className="p-3">{new Date(o.orderDate).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/pages/SegmentDetail.jsx
+================================================
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import api from '../api/apiClient';
+import Loading from '../components/Loading';
+
+export default function SegmentDetail(){
+  const { id } = useParams();
+  const [seg, setSeg] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(()=>{
+    async function load(){
+      try {
+        const res = await api.get(`/segments/${id}`);
+        setSeg(res.data);
+      } catch (err) { console.error(err); }
+      finally { setLoading(false); }
+    }
+    load();
+  },[id]);
+
+  if (loading) return <Loading />;
+  if (!seg) return <div>Segment not found</div>;
+
+  return (
+    <div className="bg-white p-6 rounded shadow">
+      <h2 className="text-xl font-semibold">{seg.name}</h2>
+      <div className="mt-4">
+        <h3 className="font-medium">Rules</h3>
+        <pre className="bg-gray-50 p-3 rounded mt-2">{JSON.stringify(seg.rules, null, 2)}</pre>
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/pages/Segments.jsx
+================================================
+import React, { useEffect, useState } from 'react';
+import api from '../api/apiClient';
+import { Link } from 'react-router-dom';
+import Loading from '../components/Loading';
+
+export default function Segments(){
+  const [segments, setSegments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(()=>{
+    async function load(){
+      try {
+        const res = await api.get('/segments');
+        // your backend doesn't have GET /api/segments listing endpoint; fallback:
+        // we'll fetch using campaigns/segments from Campaigns? If not available, show message.
+        setSegments(res.data || []);
+      } catch (err) {
+        // If endpoint missing, fetch none
+        console.warn('GET /api/segments not present on backend, will show Create route only.');
+        setSegments([]);
+      } finally { setLoading(false); }
+    }
+    load();
+  },[]);
+
+  if (loading) return <Loading/>;
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold">Segments</h2>
+        <Link to="/segments/new" className="px-3 py-2 bg-accent text-white rounded">Create segment</Link>
+      </div>
+
+      <div className="bg-white rounded shadow p-4">
+        {segments.length === 0 ? (
+          <div className="text-gray-600">No saved segments available. Create a new segment.</div>
+        ) : (
+          <ul className="space-y-2">
+            {segments.map(s => (
+              <li key={s._id} className="flex justify-between items-center border-b py-2">
+                <div>
+                  <div className="font-medium">{s.name}</div>
+                  <div className="text-sm text-gray-500">{s.rules?.length || 0} rules</div>
+                </div>
+                <div>
+                  <Link to={`/segments/${s._id}`} className="text-accent">View</Link>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: frontend/src/utils/helpers.js
+================================================
+import dayjs from 'dayjs';
+
+export const fmtDate = (d) => d ? dayjs(d).format('YYYY-MM-DD HH:mm') : '-';
+
+

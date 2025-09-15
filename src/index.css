@@ -1,0 +1,218 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Modern CRM Design System - Purple/Blue Gradient Theme */
+@layer base {
+  :root {
+    /* Core brand colors */
+    --primary: 269 85% 60%;
+    --primary-dark: 269 85% 45%;
+    --primary-light: 269 85% 75%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary colors */
+    --secondary: 250 100% 50%;
+    --secondary-light: 250 100% 65%;
+    --accent: 196 78% 50%;
+    --accent-light: 196 78% 65%;
+    
+    /* Neutral colors */
+    --background: 240 20% 5%;
+    --surface: 240 20% 8%;
+    --surface-light: 240 20% 12%;
+    --foreground: 0 0% 95%;
+    --muted: 240 10% 25%;
+    --muted-foreground: 240 5% 65%;
+    
+    /* Glass morphism */
+    --glass: 240 20% 8% / 0.3;
+    --glass-border: 240 30% 30% / 0.2;
+    
+    /* Status colors */
+    --success: 142 76% 36%;
+    --warning: 38 92% 50%;
+    --error: 0 84% 60%;
+    --info: 217 91% 60%;
+    
+    /* Component specific */
+    --card: 240 20% 8%;
+    --card-foreground: 0 0% 95%;
+    --border: 240 30% 15%;
+    --input: 240 20% 12%;
+    --ring: 269 85% 60%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(269 85% 60%), hsl(250 100% 50%));
+    --gradient-surface: linear-gradient(135deg, hsl(240 20% 8%), hsl(240 20% 12%));
+    --gradient-accent: linear-gradient(135deg, hsl(196 78% 50%), hsl(269 85% 60%));
+    --gradient-glass: linear-gradient(135deg, hsla(240, 20%, 8%, 0.4), hsla(240, 20%, 12%, 0.6));
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsla(240, 20%, 0%, 0.05);
+    --shadow-md: 0 4px 6px -1px hsla(240, 20%, 0%, 0.1), 0 2px 4px -1px hsla(240, 20%, 0%, 0.06);
+    --shadow-lg: 0 10px 15px -3px hsla(240, 20%, 0%, 0.1), 0 4px 6px -2px hsla(240, 20%, 0%, 0.05);
+    --shadow-glow: 0 0 20px hsla(269, 85%, 60%, 0.3);
+    --shadow-glow-accent: 0 0 30px hsla(196, 78%, 50%, 0.4);
+    
+    /* Animation */
+    --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    --radius: 12px;
+    
+    /* Fonts */
+    --font-primary: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Monaco', monospace;
+  }
+  
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-primary antialiased;
+    background: linear-gradient(135deg, hsl(240 20% 5%) 0%, hsl(240 20% 8%) 100%);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  /* Glass morphism card */
+  .glass-card {
+    @apply bg-surface/30 backdrop-blur-xl border border-white/10 rounded-lg;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  }
+  
+  /* Gradient text */
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Animated gradient background */
+  .gradient-bg {
+    background: var(--gradient-primary);
+    background-size: 200% 200%;
+    animation: gradientShift 6s ease infinite;
+  }
+  
+  /* Hover glow effect */
+  .hover-glow {
+    transition: var(--transition-smooth);
+  }
+  
+  .hover-glow:hover {
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+  }
+  
+  /* Sidebar styles */
+  .sidebar-item {
+    @apply relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200;
+  }
+  
+  .sidebar-item:hover {
+    @apply bg-white/5;
+  }
+  
+  .sidebar-item.active {
+    @apply bg-gradient-to-r from-primary/20 to-secondary/20;
+    box-shadow: inset 2px 0 0 hsl(var(--primary));
+  }
+  
+  /* Table enhancements */
+  .data-table {
+    @apply w-full border-collapse;
+  }
+  
+  .data-table th {
+    @apply px-6 py-4 text-left text-sm font-semibold text-muted-foreground border-b border-border;
+  }
+  
+  .data-table td {
+    @apply px-6 py-4 text-sm border-b border-border/50;
+  }
+  
+  .data-table tbody tr {
+    @apply hover:bg-white/5 transition-colors;
+  }
+  
+  /* Form styling */
+  .form-group {
+    @apply space-y-2;
+  }
+  
+  .form-label {
+    @apply text-sm font-medium text-foreground;
+  }
+  
+  .form-input {
+    @apply w-full px-4 py-3 bg-surface border border-border rounded-lg 
+           focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary
+           transition-all placeholder:text-muted-foreground;
+  }
+  
+  /* Status badges */
+  .status-active {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success/10 text-green-400;
+  }
+  
+  .status-inactive {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted/10 text-muted-foreground;
+  }
+  
+  .status-pending {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-warning/10 text-yellow-400;
+  }
+}
+
+@layer utilities {
+  /* Animations */
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 5px hsl(var(--primary)); }
+    50% { box-shadow: 0 0 20px hsl(var(--primary)), 0 0 30px hsl(var(--primary)); }
+  }
+  
+  /* Animation classes */
+  .animate-fade-in { animation: fadeIn 0.6s ease-out; }
+  .animate-slide-in { animation: slideIn 0.5s ease-out; }
+  .animate-float { animation: float 3s ease-in-out infinite; }
+  .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
